@@ -249,16 +249,22 @@ export default class App {
     
     let hitPoint = null;
     let hitObject = null;
-    
-    // 1. First, try to intersect actual 3D meshes (exclude indicators/ghosts)
-    const objectsToTest = this.scene.children.filter(c => c !== this.hoverIndicator && c !== this.ghostObject && !c.isLight && !c.userData.isGizmo);
+
+    // 1. First, try to intersect actual 3D meshes (exclude indicators/ghosts/grid)
+    const objectsToTest = this.scene.children.filter(c => 
+      c !== this.hoverIndicator && 
+      c !== this.ghostObject && 
+      c !== this.gridGroup && 
+      !c.isLight && 
+      !c.userData.isGizmo
+    );
     const intersects = this.raycaster.intersectObjects(objectsToTest, true);
     
     if (intersects.length > 0) {
       hitPoint = intersects[0].point;
       // Walk up the tree to find the root object that was added to the scene
       let obj = intersects[0].object;
-      while (obj.parent && obj.parent !== this.scene && obj.parent !== this.gridGroup) {
+      while (obj.parent && obj.parent !== this.scene) {
         obj = obj.parent;
       }
       hitObject = obj;
@@ -410,21 +416,41 @@ export default class App {
   }
 
   /** Set/clear ghost */
-  setGhost(object3d, gx, gz, rotY, yOffset = 0) {
+  setGhost(object3d, gx, gz, rotY, yOffset = 0, filename = '') {
     this.clearGhost();
     if (!object3d) return;
-    this.ghostObject = object3d.clone();
-    this.ghostObject.traverse(c => {
+    const obj = object3d.clone();
+    obj.traverse(c => {
       if (c.isMesh) {
         c.material = c.material.clone();
         c.material.transparent = true;
         c.material.opacity = 0.4;
       }
     });
+
+    const wrapper = new THREE.Group();
+    wrapper.add(obj);
+
+    const autoPivotX = 0;
+    const autoPivotY = 0;
+    const autoPivotZ = 0;
+
+    obj.position.set(0, 0, 0);
+
+    let packScale = 1.0;
+    if (filename && filename.toLowerCase().includes('survival-kit')) packScale = 2.0;
+    const scale = this.tileSize * packScale;
+    wrapper.scale.set(scale, scale, scale);
+
     const pos = this.gridToWorld(gx, gz);
-    this.ghostObject.position.copy(pos);
-    this.ghostObject.position.y = yOffset;
-    this.ghostObject.rotation.y = rotY || 0;
+    const rotatedPivot = new THREE.Vector3(autoPivotX * scale, autoPivotY * scale, autoPivotZ * scale);
+    const rotEuler = new THREE.Euler(0, rotY || 0, 0);
+    rotatedPivot.applyEuler(rotEuler);
+
+    wrapper.position.set(pos.x + rotatedPivot.x, yOffset + rotatedPivot.y, pos.z + rotatedPivot.z);
+    wrapper.rotation.y = rotEuler.y;
+
+    this.ghostObject = wrapper;
     this.scene.add(this.ghostObject);
   }
   clearGhost() {

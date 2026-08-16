@@ -1,207 +1,565 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MapKit Editor — 3D Map Builder</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/assets/index-BscXwGc5.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-C6HKb6aX.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MapKit Studio Editor</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <script type="module" crossorigin src="/assets/index-BKOsJ4mT.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-D8Nx2KUl.css">
 </head>
-<body>
-  <div id="editor-screen">
-    <!-- Top Toolbar -->
-    <div id="toolbar">
-      <div class="toolbar-left">
-        <input type="text" id="map-name-input" class="map-name-input" value="arena_map" placeholder="Map Name" />
-      </div>
-      <div class="toolbar-center">
-        <button id="tool-select" class="tool-btn active" title="Select (V)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
-        </button>
-        <button id="tool-place" class="tool-btn" title="Place (B)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        </button>
-        <button id="tool-paint" class="tool-btn" title="Paint (P)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
-        </button>
-        <button id="tool-erase" class="tool-btn" title="Eraser (E)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H7L3 16l9-9 8 8-4 4"/><path d="M6.5 13.5l5-5"/></svg>
-        </button>
-        <div class="toolbar-divider"></div>
-        <button id="btn-rotate-cw" class="tool-btn" title="Rotate CW (R)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        </button>
-        <button id="btn-rotate-ccw" class="tool-btn" title="Rotate CCW (Shift+R)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-        </button>
-        <div class="toolbar-divider"></div>
-        <button id="btn-undo" class="tool-btn" title="Undo (Ctrl+Z)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
-        </button>
-        <button id="btn-redo" class="tool-btn" title="Redo (Ctrl+Y)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
-        </button>
-      </div>
-      <div class="toolbar-right">
-        <button class="tool-btn" id="btn-auto-gen" title="Auto Generate Map (Procedural)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-        </button>
-        <button class="tool-btn" id="btn-settings" title="Settings">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        </button>
-        <button id="btn-save" class="btn-primary" style="margin-left: 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Save
-        </button>
+<body class="theme-light h-screen flex flex-col text-sm bg-gray-100 select-none">
+  
+  <!-- BEGIN: Top Studio Menu Bar (VS Code / Studio style) -->
+  <div class="menu-bar flex items-center bg-slate-900 text-slate-300 text-xs px-3 py-1.5 border-b border-slate-800 space-x-4 shrink-0 z-30">
+    <div class="font-bold text-white flex items-center space-x-2 mr-2">
+      <i class="fas fa-cube text-blue-400 text-sm"></i>
+      <span class="tracking-wide">MapKit Studio</span>
+    </div>
+    
+    <!-- File Menu -->
+    <div class="relative group cursor-pointer hover:text-white py-0.5">
+      <span>File</span>
+      <div class="hidden group-hover:block absolute top-full left-0 bg-slate-800 text-slate-200 border border-slate-700 rounded-md shadow-2xl py-1 w-48 z-50">
+        <div id="btn-file-new" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-file-alt mr-2 text-slate-400"></i> New Map</span>
+        </div>
+        <div id="btn-load-map" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-folder-open mr-2 text-slate-400"></i> Open JSON...</span>
+        </div>
+        <hr class="border-slate-700 my-1"/>
+        <div id="btn-save-menu" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-save mr-2 text-slate-400"></i> Save Map</span>
+          <span class="text-[10px] text-slate-400">Ctrl+S</span>
+        </div>
       </div>
     </div>
 
-    <!-- Main Editor Area -->
-    <div id="editor-body">
-      <!-- Left: Asset Panel -->
-      <div id="asset-panel">
-        
-        <!-- Setup Section (Initial) -->
-        <div id="setup-section">
-          <h2>MapKit Editor</h2>
-          <p>Trực quan hóa Grid & Map 3D</p>
+    <!-- Edit Menu -->
+    <div class="relative group cursor-pointer hover:text-white py-0.5">
+      <span>Edit</span>
+      <div class="hidden group-hover:block absolute top-full left-0 bg-slate-800 text-slate-200 border border-slate-700 rounded-md shadow-2xl py-1 w-48 z-50">
+        <div id="menu-undo" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-undo mr-2 text-slate-400"></i> Undo</span>
+          <span class="text-[10px] text-slate-400">Ctrl+Z</span>
+        </div>
+        <div id="menu-redo" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-redo mr-2 text-slate-400"></i> Redo</span>
+          <span class="text-[10px] text-slate-400">Ctrl+Y</span>
+        </div>
+        <hr class="border-slate-700 my-1"/>
+        <div id="menu-autogen" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-magic mr-2 text-purple-400"></i> Auto Generate</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Menu (Toggle Panels) -->
+    <div class="relative group cursor-pointer hover:text-white py-0.5">
+      <span>View</span>
+      <div class="hidden group-hover:block absolute top-full left-0 bg-slate-800 text-slate-200 border border-slate-700 rounded-md shadow-2xl py-1 w-52 z-50">
+        <div id="btn-toggle-left-panel" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between">
+          <span><i class="fas fa-toolbox mr-2 text-slate-400"></i> Asset Toolbox</span>
+          <i class="fas fa-check text-xs text-blue-400" id="chk-toolbox"></i>
+        </div>
+        <div id="btn-toggle-props-panel" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between">
+          <span><i class="fas fa-sliders-h mr-2 text-slate-400"></i> Properties Panel</span>
+          <i class="fas fa-check text-xs text-blue-400" id="chk-props"></i>
+        </div>
+        <div id="btn-toggle-minimap-panel" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between">
+          <span><i class="fas fa-map mr-2 text-slate-400"></i> Minimap</span>
+          <i class="fas fa-check text-xs text-blue-400" id="chk-minimap"></i>
+        </div>
+        <hr class="border-slate-700 my-1"/>
+        <div id="btn-toggle-ribbon" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between">
+          <span><i class="fas fa-bars mr-2 text-slate-400"></i> Action Ribbon</span>
+          <i class="fas fa-check text-xs text-blue-400" id="chk-ribbon"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Window Menu -->
+    <div class="relative group cursor-pointer hover:text-white py-0.5">
+      <span>Window</span>
+      <div class="hidden group-hover:block absolute top-full left-0 bg-slate-800 text-slate-200 border border-slate-700 rounded-md shadow-2xl py-1 w-48 z-50">
+        <div id="btn-reset-layout" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white">
+          <span><i class="fas fa-columns mr-2 text-slate-400"></i> Reset Layout</span>
+        </div>
+        <div id="btn-settings-menu" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white">
+          <span><i class="fas fa-cog mr-2 text-slate-400"></i> Preferences...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1"></div>
+
+    <!-- Map Name & Save Quick Control -->
+    <div class="flex items-center space-x-2">
+      <input type="text" id="map-name-input" value="arena_map" class="bg-slate-800 text-slate-100 text-xs border border-slate-700 rounded px-2 py-0.5 w-32 focus:outline-none focus:border-blue-500 font-semibold" placeholder="Map Name" />
+      <button id="btn-save" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-0.5 rounded text-xs font-semibold flex items-center space-x-1.5 shadow transition-colors">
+        <i class="fas fa-save text-[11px]"></i><span>Save</span>
+      </button>
+    </div>
+  </div>
+  <!-- END: Top Studio Menu Bar -->
+
+  <!-- BEGIN: Action Ribbon Toolbar -->
+  <header id="action-ribbon" class="bg-white border-b border-gray-200 p-1 flex items-center shadow-sm shrink-0 z-20 overflow-x-auto">
+    
+    <!-- Transform Tools Group -->
+    <div class="flex items-center space-x-0.5" id="toolbar">
+      <button id="tool-t-select" class="tool-btn active" title="Select Object (1)"><i class="fas fa-mouse-pointer text-sm"></i><span class="text-[10px] mt-0.5 font-bold">Select</span></button>
+      <button id="tool-t-move" class="tool-btn" title="Move Object (2)"><i class="fas fa-arrows-up-down-left-right text-sm"></i><span class="text-[10px] mt-0.5 font-bold">Move</span></button>
+      <button id="tool-t-scale" class="tool-btn" title="Scale Object"><i class="fas fa-expand-arrows-alt text-sm"></i><span class="text-[10px] mt-0.5 font-bold">Scale</span></button>
+      <button id="tool-t-rotate" class="tool-btn" title="Rotate Object (3)"><i class="fas fa-sync-alt text-sm"></i><span class="text-[10px] mt-0.5 font-bold">Rotate</span></button>
+    </div>
+    
+    <div class="h-6 w-[1px] bg-gray-200 mx-2"></div>
+
+    <!-- Drawing & Edit Tools -->
+    <div class="flex items-center space-x-0.5">
+      <button id="tool-select" class="tool-btn" title="Pick Tile (V)"><i class="fas fa-hand-pointer text-sm text-slate-600"></i><span class="text-[10px] mt-0.5">Pick</span></button>
+      <button id="tool-place" class="tool-btn" title="Place Asset (B)"><i class="fas fa-cube text-sm text-blue-600"></i><span class="text-[10px] mt-0.5">Place</span></button>
+      <button id="tool-paint" class="tool-btn" title="Paint Asset (P)"><i class="fas fa-paint-brush text-sm text-purple-600"></i><span class="text-[10px] mt-0.5">Paint</span></button>
+      <button id="tool-erase" class="tool-btn" title="Erase Asset (E)"><i class="fas fa-eraser text-sm text-red-500"></i><span class="text-[10px] mt-0.5">Erase</span></button>
+    </div>
+
+    <div class="h-6 w-[1px] bg-gray-200 mx-2"></div>
+
+    <!-- History & Rotation -->
+    <div class="flex items-center space-x-0.5">
+      <button id="btn-undo" class="tool-btn" title="Undo (Ctrl+Z)"><i class="fas fa-undo text-sm"></i><span class="text-[10px] mt-0.5">Undo</span></button>
+      <button id="btn-redo" class="tool-btn" title="Redo (Ctrl+Y)"><i class="fas fa-redo text-sm"></i><span class="text-[10px] mt-0.5">Redo</span></button>
+      <button id="btn-rotate-cw" class="tool-btn" title="Rotate CW (R)"><i class="fas fa-sync-alt text-sm text-slate-500"></i><span class="text-[10px] mt-0.5">Rot CW</span></button>
+      <button id="btn-rotate-ccw" class="tool-btn" title="Rotate CCW (Shift+R)"><i class="fas fa-sync-alt fa-flip-horizontal text-sm text-slate-500"></i><span class="text-[10px] mt-0.5">Rot CCW</span></button>
+    </div>
+
+    <div class="h-6 w-[1px] bg-gray-200 mx-2"></div>
+
+    <!-- Snapping Config -->
+    <div class="flex items-center space-x-2 bg-gray-50 px-2.5 py-1 rounded border border-gray-200 text-xs">
+      <label class="flex items-center cursor-pointer font-bold text-gray-700">
+        <input type="checkbox" id="snap-enabled" checked class="mr-1.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" /> Snap
+      </label>
+      <div class="flex items-center space-x-1.5">
+        <div class="flex items-center bg-white border border-gray-300 rounded overflow-hidden">
+          <span class="px-1 text-gray-400 text-[10px] bg-gray-50 border-r border-gray-200">Grid</span>
+          <input type="number" id="snap-move-val" value="1" min="0.1" step="0.1" class="w-10 text-xs border-none p-0.5 text-center focus:ring-0" />
+        </div>
+        <div class="flex items-center bg-white border border-gray-300 rounded overflow-hidden">
+          <span class="px-1 text-gray-400 text-[10px] bg-gray-50 border-r border-gray-200">Rot°</span>
+          <input type="number" id="snap-rotate-val" value="90" min="1" step="1" class="w-10 text-xs border-none p-0.5 text-center focus:ring-0" />
+        </div>
+      </div>
+    </div>
+
+    <div class="h-6 w-[1px] bg-gray-200 mx-2"></div>
+
+    <!-- Quick Action Extras -->
+    <div class="flex items-center space-x-1">
+      <button id="btn-auto-gen" class="tool-btn" title="Procedural Generator"><i class="fas fa-magic text-sm text-purple-600"></i><span class="text-[10px] mt-0.5">Generate</span></button>
+      <button id="btn-settings" class="tool-btn" title="Settings Panel"><i class="fas fa-cog text-sm text-slate-600"></i><span class="text-[10px] mt-0.5">Settings</span></button>
+    </div>
+
+    <div class="flex-1"></div>
+
+    <!-- Quick Toggle Panel Buttons -->
+    <div class="flex items-center space-x-1 bg-gray-100 p-0.5 rounded border border-gray-200">
+      <button id="btn-quick-toolbox" class="px-2 py-1 bg-white shadow-sm border border-gray-200 rounded text-xs font-semibold text-slate-700 hover:text-blue-600 flex items-center space-x-1" title="Toggle Asset Toolbox">
+        <i class="fas fa-toolbox text-blue-500"></i><span>Assets</span>
+      </button>
+      <button id="btn-quick-props" class="px-2 py-1 bg-white shadow-sm border border-gray-200 rounded text-xs font-semibold text-slate-700 hover:text-blue-600 flex items-center space-x-1" title="Toggle Properties">
+        <i class="fas fa-sliders-h text-indigo-500"></i><span>Props</span>
+      </button>
+      <button id="btn-quick-minimap" class="px-2 py-1 bg-white shadow-sm border border-gray-200 rounded text-xs font-semibold text-slate-700 hover:text-blue-600 flex items-center space-x-1" title="Toggle Minimap">
+        <i class="fas fa-map text-emerald-500"></i><span>Minimap</span>
+      </button>
+    </div>
+  </header>
+  <!-- END: Action Ribbon Toolbar -->
+
+  <!-- BEGIN: Main Workspace Area -->
+  <main class="flex-1 relative overflow-hidden bg-gray-200">
+    
+    <!-- 1. FULLSCREEN 3D VIEWPORT (Background Layer) -->
+    <section class="absolute inset-0 z-0 flex flex-col" id="viewport-wrapper">
+      <!-- Status Badge Overlay -->
+      <div id="status-bar" class="absolute top-3 left-3 flex space-x-2 z-10 text-xs font-mono select-none pointer-events-none">
+        <div id="status-tool" class="bg-slate-900/80 text-slate-100 px-2.5 py-1 rounded-md backdrop-blur-md shadow border border-slate-700/50">Tool: Select</div>
+        <div id="status-coords" class="bg-slate-900/80 text-slate-100 px-2.5 py-1 rounded-md backdrop-blur-md shadow border border-slate-700/50">X: 0, Z: 0</div>
+        <div id="status-count" class="bg-slate-900/80 text-slate-100 px-2.5 py-1 rounded-md backdrop-blur-md shadow border border-slate-700/50">Obj: 0</div>
+      </div>
+      <!-- 3D Viewport Canvas Container -->
+      <div id="viewport" class="w-full h-full bg-slate-900 outline-none relative overflow-hidden" tabindex="0"></div>
+    </section>
+
+    <!-- 2. FOREGROUND UI LAYER (Pointer events none so you can click the 3D map through empty spaces) -->
+    <div class="absolute inset-0 z-10 pointer-events-none flex justify-between overflow-hidden">
+      
+      <!-- LEFT SIDE WRAPPER -->
+      <div class="flex h-full pointer-events-auto" id="dock-left-wrapper">
+        <!-- LEFT DOCK -->
+        <aside id="dock-left" class="bg-white/95 backdrop-blur-xl border-r border-gray-200/60 flex flex-col shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.06)]" style="width: 270px; min-width: 200px; max-width: 450px;">
           
-          <div class="grid-size-config">
-            <label>Grid Size:</label>
-            <input type="number" id="grid-width" value="25" min="5" max="100" />
-            <span>×</span>
-            <input type="number" id="grid-height" value="25" min="5" max="100" />
+          <!-- Toolbox Panel -->
+          <div id="asset-panel" class="dockable-panel flex flex-col flex-1 bg-transparent overflow-hidden group">
+            
+            <!-- Panel Header -->
+            <div class="dock-handle bg-slate-50/80 backdrop-blur border-b border-gray-200/80 px-3 py-2 flex justify-between items-center shrink-0 cursor-grab">
+              <span class="font-bold text-[11px] text-slate-600 uppercase tracking-wider flex items-center pointer-events-none">
+                <i class="fas fa-grip-vertical text-slate-300 mr-2 group-hover:text-slate-400 transition-colors"></i>
+                <i class="fas fa-toolbox text-blue-500 mr-2"></i> Toolbox
+              </span>
+              <div class="flex items-center space-x-1 text-slate-400">
+                <button id="btn-minimize-toolbox" class="hover:text-blue-600 hover:bg-blue-50/50 transition-colors p-1 rounded text-xs leading-none" title="Minimize Vertically"><i class="fas fa-minus"></i></button>
+                <button id="btn-add-kit" class="hover:text-emerald-600 hover:bg-emerald-50/50 transition-colors p-1 rounded text-xs leading-none" title="Add Kit Folder"><i class="fas fa-folder-plus"></i></button>
+                <button id="btn-collapse-left" class="hover:text-red-500 hover:bg-red-50/50 transition-colors p-1 rounded text-xs leading-none" title="Hide Panel"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+            
+            <!-- Hidden compatibility setup section (used programmatically) -->
+            <div id="setup-section" class="hidden">
+              <input type="number" id="grid-width" value="50" />
+              <input type="number" id="grid-height" value="50" />
+              <button id="btn-start"></button>
+            </div>
+
+            <!-- Asset Browser Section -->
+            <div id="browser-section" class="flex flex-col h-full overflow-hidden transition-all duration-300">
+              <!-- Layer Selector Tabs -->
+              <div class="flex border-b border-gray-200/80 bg-gray-50/50 shrink-0">
+                <button id="layer-prop" class="layer-btn active flex-1"><i class="fas fa-cubes mr-1.5"></i>Props</button>
+                <button id="layer-ground" class="layer-btn flex-1"><i class="fas fa-square mr-1.5"></i>Ground</button>
+              </div>
+              
+              <!-- Search & Category Filters -->
+              <div class="p-3 border-b border-gray-200/80 bg-white/50 space-y-2 shrink-0 shadow-sm relative">
+                <div class="relative group-search">
+                  <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-xs transition-colors group-focus-within:text-blue-500"></i>
+                  <input type="text" id="asset-search" class="w-full text-xs pl-8 pr-3 py-2 border border-gray-200 rounded-lg bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-inner" placeholder="Search models..." />
+                </div>
+                <div class="relative">
+                  <select id="category-filter" class="w-full text-xs border border-gray-200 rounded-lg py-2 px-3 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none">
+                    <option value="all">All Categories</option>
+                  </select>
+                  <i class="fas fa-chevron-down absolute right-3 top-2.5 text-slate-400 text-[10px] pointer-events-none"></i>
+                </div>
+              </div>
+              
+              <!-- Asset Cards Grid -->
+              <div class="flex-1 overflow-y-auto p-2 bg-slate-50/30">
+                <div id="asset-grid" class="grid grid-cols-2 gap-2"></div>
+              </div>
+              
+              <!-- Pagination Controls -->
+              <div id="pagination-controls" class="border-t border-gray-200/80 bg-white/50 p-1.5 flex justify-center space-x-1 shrink-0 overflow-x-auto"></div>
+            </div>
+          </div>
+        </aside>
+        
+        <!-- LEFT RESIZER HANDLE -->
+        <div id="resizer-left" class="panel-resizer w-1.5 cursor-col-resize hover:bg-blue-400/50 transition-colors bg-transparent border-r border-transparent" title="Drag to resize left panel"></div>
+      </div>
+
+      <!-- INVISIBLE SPACER TO KEEP RIGHT DOCK ON THE RIGHT -->
+      <div class="flex-1 pointer-events-none"></div>
+
+      <!-- RIGHT SIDE WRAPPER -->
+      <div class="flex h-full pointer-events-auto" id="dock-right-wrapper">
+        <!-- RIGHT RESIZER HANDLE -->
+        <div id="resizer-right" class="panel-resizer w-1.5 cursor-col-resize hover:bg-blue-400/50 transition-colors bg-transparent border-l border-transparent" title="Drag to resize right panel"></div>
+        
+        <!-- RIGHT DOCK -->
+        <aside id="dock-right" class="bg-white/95 backdrop-blur-xl border-l border-gray-200/60 flex flex-col shrink-0 shadow-[-4px_0_24px_rgba(0,0,0,0.06)]" style="width: 280px; min-width: 220px; max-width: 480px;">
+          
+          <!-- Minimap Panel -->
+          <div id="minimap-container" class="dockable-panel flex flex-col border-b border-gray-200/80 bg-transparent shrink-0 group overflow-hidden" style="height: 220px;">
+            <div class="dock-handle bg-slate-50/80 backdrop-blur border-b border-gray-200/80 px-3 py-2 flex justify-between items-center shrink-0 cursor-grab">
+              <span class="font-bold text-[11px] text-slate-600 uppercase tracking-wider flex items-center pointer-events-none">
+                <i class="fas fa-grip-vertical text-slate-300 mr-2 group-hover:text-slate-400 transition-colors"></i>
+                <i class="fas fa-map text-emerald-500 mr-2"></i> Minimap (M)
+              </span>
+              <div class="flex items-center space-x-1 text-slate-400">
+                <button id="btn-toggle-minimap-minimize" class="hover:text-blue-600 hover:bg-blue-50/50 transition-colors rounded p-1 text-xs leading-none" title="Minimize Vertically"><i class="fas fa-minus"></i></button>
+                <button id="btn-toggle-minimap-panel" class="hover:text-red-500 hover:bg-red-50/50 transition-colors rounded p-1 text-xs leading-none" title="Close Minimap"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+            <div class="flex-1 relative bg-slate-900 overflow-hidden flex items-center justify-center p-0.5">
+              <canvas id="minimap" class="w-full h-full object-contain"></canvas>
+            </div>
           </div>
 
-          <button id="btn-start" class="btn-primary" style="width: 100%; margin-bottom: 8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>
-            Bắt Đầu (Start Editor)
-          </button>
+          <!-- MINIMAP HEIGHT RESIZER -->
+          <div id="resizer-minimap" class="h-1 bg-transparent hover:bg-blue-400/50 cursor-row-resize shrink-0 transition-colors" title="Drag up/down to resize Minimap height"></div>
           
-          <button id="btn-load-map" class="btn-secondary" style="width: 100%;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            Load Map JSON
-          </button>
+          <!-- Properties Panel -->
+          <div id="property-panel" class="dockable-panel flex flex-col flex-1 bg-transparent overflow-hidden min-h-0 group">
+            <div class="dock-handle bg-slate-50/80 backdrop-blur border-b border-gray-200/80 px-3 py-2 flex justify-between items-center shrink-0 cursor-grab">
+              <span class="font-bold text-[11px] text-slate-600 uppercase tracking-wider flex items-center pointer-events-none">
+                <i class="fas fa-grip-vertical text-slate-300 mr-2 group-hover:text-slate-400 transition-colors"></i>
+                <i class="fas fa-sliders-h text-indigo-500 mr-2"></i> Properties
+              </span>
+              <div class="flex items-center space-x-1 text-slate-400">
+                <button id="btn-minimize-props" class="hover:text-blue-600 hover:bg-blue-50/50 transition-colors p-1 rounded text-xs leading-none" title="Minimize Vertically"><i class="fas fa-minus"></i></button>
+                <button id="btn-collapse-right" class="hover:text-red-500 hover:bg-red-50/50 transition-colors rounded p-1 text-xs leading-none" title="Hide Right Panel"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+            <div id="prop-content" class="flex-1 overflow-y-auto p-2">
+              <div class="p-6 text-center text-slate-400 text-xs font-semibold mt-4">
+                <i class="fas fa-mouse-pointer text-3xl mb-3 opacity-20 block text-slate-500"></i>
+                Click an object on the map to inspect properties
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+    </div>
+  </main>
+  <!-- END: Main Workspace Area -->
+
+  <!-- OVERLAYS: Floating Minimap Window (Draggable) -->
+  <div id="large-minimap-overlay" class="hidden fixed z-50 flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-300" style="width: 480px; height: 480px; top: 80px; right: 80px;">
+    <div id="minimap-drag-header" class="bg-gray-100 p-2.5 border-b border-gray-200 flex justify-between items-center cursor-move select-none">
+      <h2 class="font-bold text-slate-800 text-xs flex items-center"><i class="fas fa-grip-vertical text-slate-400 mr-2"></i><i class="fas fa-map text-emerald-600 mr-1.5"></i> Floating Minimap Window</h2>
+      <div class="flex items-center space-x-2">
+        <span class="text-[10px] text-slate-400 bg-gray-200 px-1.5 py-0.5 rounded font-mono">Press <b>M</b></span>
+        <button id="btn-close-large-minimap" class="text-slate-400 hover:text-red-500 text-xs px-1"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="flex-1 bg-slate-950 p-2 flex items-center justify-center overflow-hidden">
+      <canvas id="minimap-large" width="600" height="600" class="w-full h-full object-contain"></canvas>
+    </div>
+  </div>
+
+  <!-- OVERLAYS: Procedural Map Generator Options Modal -->
+  <div id="generator-overlay" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center backdrop-blur-md transition-opacity">
+    <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-[520px] max-h-[90vh] flex flex-col overflow-hidden border border-white/20 transform transition-transform">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-purple-50 to-indigo-50/80 p-4 border-b border-purple-100 flex justify-between items-center shrink-0">
+        <h2 class="font-bold text-slate-800 text-base flex items-center tracking-tight">
+          <i class="fas fa-magic text-purple-600 mr-2.5"></i> Procedural World Generator
+        </h2>
+        <button id="btn-close-gen-x" class="text-slate-400 hover:text-red-500 hover:bg-red-50 text-base p-1.5 rounded-lg transition-colors">
+          <i class="fas fa-times w-4 h-4 flex items-center justify-center"></i>
+        </button>
+      </div>
+
+      <!-- Scrollable Body -->
+      <div class="p-5 space-y-4 text-xs overflow-y-auto flex-1">
+        
+        <!-- Theme & Preset -->
+        <div class="space-y-1.5">
+          <label class="font-bold text-slate-700 uppercase tracking-wider flex items-center">
+            <i class="fas fa-chess-rook text-indigo-500 mr-1.5"></i> World Theme & Kit Preset
+          </label>
+          <select id="gen-theme" class="w-full text-xs border border-gray-200 rounded-lg p-2 bg-white shadow-sm focus:ring-2 focus:ring-purple-500 outline-none font-medium text-slate-800">
+            <option value="fantasy_kingdom">🏰 Fantasy Kingdom & Citadel (Town Plaza, Fountain, Hedge Garden, Market)</option>
+            <option value="emerald_sanctuary">🌿 Emerald Sanctuary (Statues, Hedge Labyrinths, Dual Fountains, Flowers)</option>
+            <option value="riverside_haven">🌊 Riverside Haven & Mill (River, Watermill, Fishing Dock, Bridges)</option>
+            <option value="nature_wilderness">🌲 Nature & Forest Wilderness (Kenney Nature Kit, Pines, Oaks, River)</option>
+            <option value="mountain_stronghold">⛰️ Mountain Stronghold & Caves (Cliff Plateaus, Caves, Stone Stairs)</option>
+            <option value="mixed_wonderland">🎲 Mixed Procedural Wonderland (All Assets & Themes Blended)</option>
+          </select>
         </div>
 
-        <!-- Browser Section (After Kit Loaded) -->
-        <div id="browser-section" style="display: none; flex-direction: column; height: 100%; overflow: hidden;">
-          <div class="panel-header">
-            <span>Assets</span>
-            <button id="btn-add-kit" class="layer-btn" title="Add another Kit folder" style="margin-left:auto; margin-right:8px; width:auto; padding: 0 8px; font-size: 0.8rem;">+ Folder</button>
-            <div class="layer-toggles">
-              <button id="layer-ground" class="layer-btn active" title="Ground Layer">G</button>
-              <button id="layer-prop" class="layer-btn active" title="Prop Layer">P</button>
-            </div>
-          </div>
-          <div class="search-filter-box">
-            <div class="search-input-wrapper">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" id="asset-search" placeholder="Search assets..." />
-            </div>
-            <select id="category-filter" class="category-select">
-              <option value="all">All Categories</option>
+        <!-- Trees & Vegetation -->
+        <div class="grid grid-cols-2 gap-3 bg-slate-50/80 p-3 rounded-xl border border-gray-100">
+          <div class="space-y-1">
+            <label class="font-semibold text-slate-700 flex items-center">
+              <i class="fas fa-tree text-emerald-600 mr-1.5"></i> Tree & Flora Style
+            </label>
+            <select id="gen-tree-style" class="w-full text-xs border border-gray-200 rounded-lg p-1.5 bg-white shadow-sm focus:ring-2 focus:ring-purple-500 outline-none">
+              <option value="fantasy">🌳 Fantasy Stylized (Crooked/Round)</option>
+              <option value="nature">🌲 Realistic Nature (Oak, Pine, Birch)</option>
+              <option value="mystical">🍄 Mystical Grove & Mushrooms</option>
+              <option value="mixed">🌿 Mixed (All Tree Models)</option>
             </select>
           </div>
-          <div id="asset-grid"></div>
-          <div id="pagination-controls" class="pagination-controls"></div>
+          <div class="space-y-1">
+            <label class="font-semibold text-slate-700 flex items-center">
+              <i class="fas fa-leaf text-emerald-600 mr-1.5"></i> Forest Density
+            </label>
+            <select id="gen-density" class="w-full text-xs border border-gray-200 rounded-lg p-1.5 bg-white shadow-sm focus:ring-2 focus:ring-purple-500 outline-none">
+              <option value="dense">Dense Forest</option>
+              <option value="medium" selected>Medium (Balanced)</option>
+              <option value="sparse">Sparse / Light</option>
+              <option value="none">Open Meadow (No Trees)</option>
+            </select>
+          </div>
         </div>
+
+        <!-- Landscape Features -->
+        <div class="space-y-2">
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[11px] block">
+            <i class="fas fa-mountain text-slate-500 mr-1"></i> Landscape & Structures
+          </span>
+          <div class="grid grid-cols-2 gap-2.5">
+            <!-- River -->
+            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-gray-100">
+              <span class="font-medium text-slate-700 flex items-center"><i class="fas fa-water text-blue-500 mr-1.5"></i> River</span>
+              <select id="gen-river" class="text-xs border border-gray-200 rounded p-1 bg-white outline-none">
+                <option value="yes" selected>Yes</option>
+                <option value="random">Random</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            <!-- Roads -->
+            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-gray-100">
+              <span class="font-medium text-slate-700 flex items-center"><i class="fas fa-road text-slate-600 mr-1.5"></i> Road Style</span>
+              <select id="gen-road" class="text-xs border border-gray-200 rounded p-1 bg-white outline-none">
+                <option value="road" selected>Cobblestone</option>
+                <option value="stone">Stone Tiles</option>
+                <option value="dirt">Dirt Path</option>
+                <option value="none">None</option>
+              </select>
+            </div>
+            <!-- Fountain & Plaza -->
+            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-gray-100">
+              <span class="font-medium text-slate-700 flex items-center"><i class="fas fa-fountain text-cyan-500 mr-1.5"></i> Fountain</span>
+              <select id="gen-fountain" class="text-xs border border-gray-200 rounded p-1 bg-white outline-none">
+                <option value="round" selected>Round Fountain</option>
+                <option value="square">Square Fountain</option>
+                <option value="random">Random Fountain</option>
+                <option value="none">No Plaza</option>
+              </select>
+            </div>
+            <!-- Village Houses -->
+            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-gray-100">
+              <span class="font-medium text-slate-700 flex items-center"><i class="fas fa-home text-amber-600 mr-1.5"></i> Houses</span>
+              <select id="gen-houses" class="text-xs border border-gray-200 rounded p-1 bg-white outline-none">
+                <option value="4">4 Buildings</option>
+                <option value="3" selected>3 Buildings</option>
+                <option value="2">2 Buildings</option>
+                <option value="1">1 Building</option>
+                <option value="0">None</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Checkbox Features -->
+          <div class="grid grid-cols-3 gap-2 pt-1">
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-gray-100 cursor-pointer hover:bg-slate-100 transition-colors">
+              <input type="checkbox" id="gen-hedge" checked class="rounded text-purple-600 focus:ring-purple-500 w-3.5 h-3.5" />
+              <span class="text-slate-700 font-medium text-[11px]"><i class="fas fa-seedling text-emerald-600 mr-1"></i> Hedge Garden</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-gray-100 cursor-pointer hover:bg-slate-100 transition-colors">
+              <input type="checkbox" id="gen-market" checked class="rounded text-purple-600 focus:ring-purple-500 w-3.5 h-3.5" />
+              <span class="text-slate-700 font-medium text-[11px]"><i class="fas fa-store text-orange-500 mr-1"></i> Market Stalls</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-gray-100 cursor-pointer hover:bg-slate-100 transition-colors">
+              <input type="checkbox" id="gen-farm" checked class="rounded text-purple-600 focus:ring-purple-500 w-3.5 h-3.5" />
+              <span class="text-slate-700 font-medium text-[11px]"><i class="fas fa-fan text-yellow-600 mr-1"></i> Farm & Windmill</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-gray-100 cursor-pointer hover:bg-slate-100 transition-colors">
+              <input type="checkbox" id="gen-watermill" checked class="rounded text-purple-600 focus:ring-purple-500 w-3.5 h-3.5" />
+              <span class="text-slate-700 font-medium text-[11px]"><i class="fas fa-water text-teal-600 mr-1"></i> Watermill & Pier</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-gray-100 cursor-pointer hover:bg-slate-100 transition-colors">
+              <input type="checkbox" id="gen-mountain" checked class="rounded text-purple-600 focus:ring-purple-500 w-3.5 h-3.5" />
+              <span class="text-slate-700 font-medium text-[11px]"><i class="fas fa-mountain text-stone-600 mr-1"></i> Cliffs & Caves</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Grid Size & Seed -->
+        <div class="grid grid-cols-2 gap-3 pt-1 border-t border-gray-100">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Grid Dimensions</label>
+            <div class="flex items-center space-x-1.5">
+              <input type="number" id="gen-grid-w" min="10" max="100" value="50" class="w-16 text-center border border-gray-200 rounded-lg p-1.5 bg-white outline-none focus:ring-2 focus:ring-purple-500" />
+              <span class="text-slate-400 font-bold">×</span>
+              <input type="number" id="gen-grid-h" min="10" max="100" value="50" class="w-16 text-center border border-gray-200 rounded-lg p-1.5 bg-white outline-none focus:ring-2 focus:ring-purple-500" />
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">World Seed</label>
+            <div class="flex space-x-1.5">
+              <input type="number" id="gen-seed" placeholder="Random Seed" class="flex-1 border border-gray-200 rounded-lg p-1.5 bg-white outline-none focus:ring-2 focus:ring-purple-500 text-xs" />
+              <button id="btn-gen-rand-seed" class="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition-colors" title="Randomize Seed">
+                <i class="fas fa-dice"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Center: 3D Viewport -->
-      <div id="viewport"></div>
-
-      <!-- Right: Property Panel -->
-      <div id="property-panel">
-        <div class="panel-header"><span>Properties</span></div>
-        <div id="prop-content">
-          <p class="prop-empty">Click an object to inspect</p>
-        </div>
-        <!-- Minimap -->
-        <div class="panel-header" style="margin-top:auto;"><span>Minimap (M)</span></div>
-        <canvas id="minimap" width="200" height="200"></canvas>
-      </div>
-    </div>
-
-    <!-- Status Bar -->
-    <div id="status-bar">
-      <span id="status-coords">X: 0, Z: 0</span>
-      <span id="status-tool">Tool: Select</span>
-      <span id="status-count">Objects: 0</span>
-    </div>
-  </div>
-
-  <!-- Large Minimap Overlay -->
-  <div id="large-minimap-overlay" class="hidden overlay-modal">
-    <div class="minimap-modal">
-      <h2>Map Overview</h2>
-      <canvas id="minimap-large" width="800" height="800"></canvas>
-      <div class="minimap-hint">Press <span>M</span> to close</div>
-    </div>
-  </div>
-
-  <!-- Settings Modal -->
-  <div id="settings-overlay" class="hidden overlay-modal">
-    <div class="settings-modal premium-modal">
-      <div class="modal-header">
-        <h2 id="lang-settings-title">Preferences</h2>
-        <button id="btn-close-settings-x" class="btn-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <!-- Footer -->
+      <div class="bg-slate-50/80 p-3.5 border-t border-gray-200 flex space-x-2.5 shrink-0">
+        <button id="btn-gen-randomize-all" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-3 rounded-xl transition-colors border border-gray-200 flex items-center justify-center space-x-1.5 text-xs">
+          <i class="fas fa-dice"></i><span>Randomize All</span>
         </button>
+        <button id="btn-close-gen" class="px-4 py-2 text-slate-500 hover:text-slate-700 font-medium rounded-xl hover:bg-slate-100 transition-colors text-xs">
+          Cancel
+        </button>
+        <button id="btn-run-generate" class="flex-[1.5] bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-xs">
+          <i class="fas fa-magic"></i><span>Generate Map</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAYS: Settings Panel Modal -->
+  <div id="settings-overlay" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center backdrop-blur-md transition-opacity">
+    <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-[420px] overflow-hidden border border-white/20 transform transition-transform">
+      <div class="bg-slate-50/80 p-4 border-b border-gray-200 flex justify-between items-center">
+        <h2 id="lang-settings-title" class="font-bold text-slate-800 text-base flex items-center tracking-tight"><i class="fas fa-sliders-h text-blue-500 mr-2.5"></i> Preferences</h2>
+        <button id="btn-close-settings-x" class="text-slate-400 hover:text-red-500 hover:bg-red-50 text-base p-1.5 rounded-lg transition-colors"><i class="fas fa-times w-4 h-4 flex items-center justify-center"></i></button>
+      </div>
+      <div class="p-5 space-y-6 text-sm">
+        
+        <!-- Graphics Section -->
+        <div>
+          <h3 id="lang-graphics" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-3">Graphics & Environment</h3>
+          <div class="space-y-3 bg-slate-50/50 p-3 rounded-xl border border-gray-100">
+            <div class="flex items-center justify-between">
+              <label class="text-slate-700 font-medium" id="lang-ui-theme">UI Theme</label>
+              <select id="ui-theme-select" class="w-40 text-sm border border-gray-200 rounded-lg p-1.5 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                <option value="light" selected>Light Studio</option>
+                <option value="dark">Dark Theme</option>
+              </select>
+            </div>
+            <div class="flex items-center justify-between">
+              <label class="text-slate-700 font-medium" id="lang-sky-theme">Sky & Lighting</label>
+              <select id="sky-theme-select" class="w-40 text-sm border border-gray-200 rounded-lg p-1.5 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                <option value="light">Day Sky</option>
+                <option value="dark">Night Sky</option>
+              </select>
+            </div>
+            <div class="hidden"><label id="lang-weather">Weather</label></div>
+          </div>
+        </div>
+        
+        <!-- Editor Section -->
+        <div>
+          <h3 id="lang-editor" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-3">Editor Setup</h3>
+          <div class="space-y-3 bg-slate-50/50 p-3 rounded-xl border border-gray-100">
+            <div>
+              <label class="block text-slate-700 font-medium mb-2" id="lang-grid-size">Grid Dimensions (W × H)</label>
+              <div class="flex items-center space-x-2">
+                <input type="number" id="setting-grid-w" min="5" max="100" class="w-20 border border-gray-200 shadow-sm rounded-lg text-sm p-1.5 text-center bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                <span class="text-slate-400 font-medium">×</span>
+                <input type="number" id="setting-grid-h" min="5" max="100" class="w-20 border border-gray-200 shadow-sm rounded-lg text-sm p-1.5 text-center bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                <button id="btn-apply-grid" class="lang-apply flex-1 bg-blue-50 text-blue-600 font-semibold py-1.5 px-3 rounded-lg hover:bg-blue-100 transition-colors border border-blue-200">Apply</button>
+              </div>
+            </div>
+            <div class="pt-2">
+              <label class="block text-slate-700 font-medium mb-2" id="lang-language">Language</label>
+              <div class="flex bg-gray-100/80 p-1 rounded-lg">
+                <button id="btn-lang-en" class="active flex-1 bg-white text-blue-600 font-semibold py-1.5 rounded shadow-sm transition-all text-xs">EN</button>
+                <button id="btn-lang-vi" class="flex-1 text-slate-500 hover:text-slate-700 font-medium py-1.5 rounded transition-all text-xs">VI</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
       
-      <div class="settings-body">
-        <div class="setting-group">
-          <h3 id="lang-graphics">Graphics & Environment</h3>
-          <div class="setting-row">
-            <label id="lang-ui-theme">UI Theme</label>
-            <select id="ui-theme-select">
-              <option value="dark">Dark Mode</option>
-              <option value="light">Light Mode</option>
-            </select>
-          </div>
-          <div class="setting-row">
-            <label id="lang-sky-theme">Sky & Lighting</label>
-            <select id="sky-theme-select">
-              <option value="dark">Night Sky</option>
-              <option value="light">Day Sky</option>
-            </select>
-          </div>
-          <div class="setting-row">
-            <label id="lang-weather">Weather</label>
-            <select id="weather-theme-select">
-              <option value="clear">Clear</option>
-              <option value="rain">Rain (Coming Soon)</option>
-              <option value="snow">Snow (Coming Soon)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="setting-group">
-          <h3 id="lang-editor">Editor Setup</h3>
-          <div class="setting-row">
-            <label id="lang-grid-size">Grid Size</label>
-            <div class="grid-input-group">
-              <input type="number" id="setting-grid-w" min="5" max="100">
-              <span>×</span>
-              <input type="number" id="setting-grid-h" min="5" max="100">
-              <button id="btn-apply-grid" class="btn-primary lang-apply">Apply</button>
-            </div>
-          </div>
-          <div class="setting-row">
-            <label id="lang-language">Language</label>
-            <div class="lang-toggle">
-              <button id="btn-lang-en" class="active">EN</button>
-              <button id="btn-lang-vi">VI</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button id="btn-close-settings" class="btn-primary lang-close" style="width: 100%;">Save & Close</button>
+      <!-- Footer -->
+      <div class="bg-slate-50/80 p-4 border-t border-gray-200">
+        <button id="btn-close-settings" class="lang-close w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">Save & Close</button>
       </div>
     </div>
   </div>

@@ -153,16 +153,26 @@ export default class ToolManager {
     } else if (tool === 't-rotate') {
       // 3D Oxyz Rotation rings (Red X, Green Y, Blue Z)
       const createRing = (color, axisName, rotEuler) => {
-        const ringGeo = new THREE.TorusGeometry(1.8, 0.05, 12, 64);
+        const ringGeo = new THREE.TorusGeometry(1.8, 0.04, 12, 64);
         let hoverC = color;
         if (axisName === 'rot-x') hoverC = 0xff6666;
         if (axisName === 'rot-y') hoverC = 0x66ff66;
         if (axisName === 'rot-z') hoverC = 0x6666ff;
+        
+        const group = new THREE.Group();
+        group.rotation.copy(rotEuler);
+        group.userData = { axis: axisName, defaultColor: color, hoverColor: hoverC, activeColor: 0xffea00 };
+        
         const ringMat = new THREE.MeshBasicMaterial({ color: color, depthTest: false, side: THREE.DoubleSide });
         const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.rotation.copy(rotEuler);
-        ring.userData = { axis: axisName, defaultColor: color, hoverColor: hoverC, activeColor: 0xffea00 };
-        return ring;
+        group.add(ring);
+        
+        const hitGeo = new THREE.TorusGeometry(1.8, 0.4, 8, 24);
+        const hitMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false, side: THREE.DoubleSide });
+        const hitMesh = new THREE.Mesh(hitGeo, hitMat);
+        group.add(hitMesh);
+        
+        return group;
       };
 
       // X ring (Red, rotates around X axis)
@@ -240,17 +250,12 @@ export default class ToolManager {
       // Update scale
       c.scale.set(targetScale, targetScale, targetScale);
 
-      // Update color for thick arrows (which are groups containing meshes)
-      if (c.type === 'Group') {
-        c.children.forEach(child => {
-          if (child.type === 'Group') {
-            child.children.forEach(mesh => mesh.material.color.setHex(colorHex));
-          }
-        });
-      } else if (c.material && c.material.color) {
-        // Sphere or ring
-        c.material.color.setHex(colorHex);
-      }
+      // Update color recursively for all visible meshes
+      c.traverse(child => {
+        if (child.isMesh && child.material && child.material.color && child.material.opacity > 0) {
+          child.material.color.setHex(colorHex);
+        }
+      });
     });
   }
 

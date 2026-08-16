@@ -196,21 +196,19 @@ export default class PlacementController {
     obj.name = 'mesh_wrapper';
     wrapper.add(obj);
 
-    // Auto-calculate center pivot
-    const box = new THREE.Box3().setFromObject(obj);
-    const center = new THREE.Vector3();
-    box.getCenter(center);
-    if (!isFinite(center.x)) center.set(0, 0, 0);
+    // In modular tile kits (Kenney kits), the (0,0) origin is ALREADY the tile center!
+    // Edge/wall assets (hedge, wall, fence) are authored at tile boundaries.
+    const autoPivotX = 0;
+    const autoPivotY = 0;
+    const autoPivotZ = 0;
 
-    const autoPivotX = center.x;
-    const autoPivotY = center.y;
-    const autoPivotZ = center.z;
+    obj.position.set(0, 0, 0);
 
-    obj.position.set(-autoPivotX, -autoPivotY, -autoPivotZ);
-
-    // Normalize scale per kit
+    // Normalize scale per kit (survival-kit uses 0.5 base units, so needs 2.0x packScale)
     let packScale = 1.0;
-    if (assetInfo.filename.includes('fantasy-town-kit')) packScale = 1.0;
+    if (assetInfo.filename && assetInfo.filename.toLowerCase().includes('survival-kit')) {
+      packScale = 2.0;
+    }
     const scale = this.app.tileSize * packScale;
     wrapper.scale.set(scale, scale, scale);
 
@@ -431,10 +429,10 @@ export default class PlacementController {
   }
 
   /** Get dynamic height of the ground cell at x, z */
-  calculatePlacementHeight(layer, x, z, filename) {
+  calculatePlacementHeight(layer, x, z, filename = '') {
     if (layer !== 'prop') return 0;
     
-    let yOffset = this.getGroundHeightAt(x, z);
+    let yOffset = this.getGroundHeightAt(x, z, filename);
     yOffset += 0.01; // Z-fighting epsilon
 
     // Auto-lift roofs that are placed over empty space
@@ -463,16 +461,25 @@ export default class PlacementController {
     return yOffset;
   }
 
-  getGroundHeightAt(x, z) {
+  getGroundHeightAt(x, z, placingFilename = '') {
     if (z < 0 || z >= this.gridH || x < 0 || x >= this.gridW) return 0;
     
     const objectsToTest = [];
     const groundCell = this.groundLayer[z][x];
     if (groundCell && groundCell.object3d) objectsToTest.push(groundCell.object3d);
     
+    const isPlacingFoliage = /tree|grass|flower|mushroom|bush|plant/i.test(placingFilename);
+
     if (this.propLayer[z][x]) {
       for (const p of this.propLayer[z][x]) {
-        if (p.object3d) objectsToTest.push(p.object3d);
+        if (p.object3d) {
+          const fn = (p.asset || '').toLowerCase();
+          // Never stack foliage on top of trees, and don't treat trees as platforms
+          if (fn.includes('tree') || (isPlacingFoliage && (fn.includes('grass') || fn.includes('flower') || fn.includes('bush')))) {
+            continue;
+          }
+          objectsToTest.push(p.object3d);
+        }
       }
     }
 

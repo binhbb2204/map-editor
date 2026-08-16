@@ -1,3 +1,4 @@
+
 /**
  * MinimapRenderer — renders the 2D minimap overview onto canvas elements.
  */
@@ -26,6 +27,7 @@ export const MINIMAP_COLORS = {
   'crops': '#aed581',
   'canoe': '#00838f',
   'watermill': '#4db6ac',
+  'windmill': '#ffb74d',
   'log': '#6d4c41',
   'stump': '#5d4037',
   'statue': '#9e9e9e',
@@ -37,11 +39,14 @@ export const MINIMAP_COLORS = {
   'roof': '#ef9a9a',
   'stairs': '#90a4ae',
   'fountain': '#4fc3f7',
-  'hedge': '#388e3c',
+  'hedge': '#2e7d32',
   'lantern': '#ffee58',
   'banner': '#e53935',
   'cart': '#a1887f',
   'stall': '#ff8f00',
+  'chimney': '#d32f2f',
+  'pillar': '#b0bec5',
+  'balcony': '#8d6e63',
 };
 
 export default class MinimapRenderer {

@@ -26,6 +26,7 @@ import SettingsPanel from './ui/SettingsPanel.js';
 import HotkeyManager from './ui/HotkeyManager.js';
 import MinimapRenderer from './ui/MinimapRenderer.js';
 import MapGenerator from './editor/MapGenerator.js';
+import GeneratorDialog from './ui/GeneratorDialog.js';
 import DockingManager from './ui/DockingManager.js';
 
 // ===================== SHARED STATE =====================
@@ -34,8 +35,8 @@ let selectedAsset = null;
 
 // ===================== INIT CORE =====================
 
-const gridW = parseInt(document.getElementById('grid-width').value) || 25;
-const gridH = parseInt(document.getElementById('grid-height').value) || 25;
+const gridW = parseInt(document.getElementById('grid-width').value) || 50;
+const gridH = parseInt(document.getElementById('grid-height').value) || 50;
 
 const app = new App(document.getElementById('viewport'));
 app.setGridSize(gridW, gridH);
@@ -657,17 +658,13 @@ document.getElementById('menu-undo')?.addEventListener('click', handleUndo);
 document.getElementById('menu-redo')?.addEventListener('click', handleRedo);
 document.getElementById('btn-undo')?.addEventListener('click', handleUndo);
 document.getElementById('btn-redo')?.addEventListener('click', handleRedo);
-const runGenerate = async () => {
-  document.body.style.cursor = 'wait';
-  await mapGenerator.generate();
-  updateStatusBar();
-  updateMinimap();
-  document.body.style.cursor = 'default';
-  notify('Map Generated');
-};
+const generatorDialog = new GeneratorDialog(app, placement, mapGenerator, {
+  onUpdateMinimap: updateMinimap,
+  onUpdateStatusBar: updateStatusBar,
+  onNotify: notify
+});
+generatorDialog.setup();
 
-document.getElementById('menu-autogen')?.addEventListener('click', runGenerate);
-document.getElementById('btn-auto-gen')?.addEventListener('click', runGenerate);
 document.getElementById('btn-settings-menu')?.addEventListener('click', () => {
   document.getElementById('settings-overlay').classList.remove('hidden');
 });

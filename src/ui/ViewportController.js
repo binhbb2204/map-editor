@@ -5,10 +5,18 @@
  */
 import * as THREE from 'three';
 
-export const GROUND_CATEGORIES = ['ground', 'platform', 'cliff'];
+export const GROUND_CATEGORIES = ['ground', 'platform', 'cliff', 'floor', 'tile', 'road', 'path', 'water', 'dirt'];
 
-export function determineLayer(category) {
-  return GROUND_CATEGORIES.includes(category) ? 'ground' : 'prop';
+export function determineLayer(category, filename = '') {
+  const cat = (category || '').toLowerCase();
+  const fn = (filename || '').toLowerCase();
+  if (GROUND_CATEGORIES.includes(cat)) return 'ground';
+  if (fn.includes('floor') || fn.includes('ground') || fn.includes('path') || 
+      fn.includes('water') || fn.includes('dirt') || fn.includes('grass') || 
+      fn.includes('road') || fn.includes('tile') || fn.includes('platform')) {
+    return 'ground';
+  }
+  return 'prop';
 }
 
 export default class ViewportController {
@@ -138,17 +146,9 @@ export default class ViewportController {
         // Draw grid hover for placement
         this.app.showHoverAt(cell.x, cell.z, 0xffffff);
         
-        const layer = determineLayer(selectedAsset.category);
+        const layer = determineLayer(selectedAsset.category, selectedAsset.filename);
         const yOffset = this.placement.calculatePlacementHeight(layer, cell.x, cell.z, selectedAsset.filename);
-        this.app.setGhost(this.app.modelCache[selectedAsset.filename], cell.x, cell.z, (tm.currentRotation * Math.PI) / 180, yOffset);
-
-        if (this.app.ghostObject) {
-          const box = new THREE.Box3().setFromObject(this.app.modelCache[selectedAsset.filename]);
-          const size = box.getSize(new THREE.Vector3());
-          const maxDim = Math.max(size.x, size.z) || 1;
-          const scale = this.app.tileSize / maxDim;
-          this.app.ghostObject.scale.set(scale, scale, scale);
-        }
+        this.app.setGhost(this.app.modelCache[selectedAsset.filename], cell.x, cell.z, (tm.currentRotation * Math.PI) / 180, yOffset, selectedAsset.filename);
       } else if (['erase', 'rotate', 'select', 't-select', 't-move', 't-rotate', 't-scale'].includes(currentTool)) {
         this.app.hideHover(); // Don't draw ground tile for selection tools
         
@@ -262,7 +262,7 @@ export default class ViewportController {
   async _doPlace(x, z) {
     const selectedAsset = this._getSelectedAsset();
     if (!selectedAsset) return;
-    const layer = determineLayer(selectedAsset.category);
+    const layer = determineLayer(selectedAsset.category, selectedAsset.filename);
     await this.placement.placeAsset(layer, x, z, selectedAsset, this._getToolManager().currentRotation);
     this._onUpdateStatusBar();
     this._onUpdateMinimap();
@@ -289,8 +289,17 @@ export default class ViewportController {
   }
 
   _doSelect(x, z) {
-    if (this._hoveredTargetCell) {
-      this.placement.selectCell(this._hoveredTargetCell.layer, this._hoveredTargetCell.x, this._hoveredTargetCell.z);
+    let target = this._hoveredTargetCell;
+    if (!target) {
+      const prop = this.placement.getCell('prop', x, z);
+      if (prop) target = { layer: 'prop', x, z };
+      else {
+        const ground = this.placement.getCell('ground', x, z);
+        if (ground) target = { layer: 'ground', x, z };
+      }
+    }
+    if (target) {
+      this.placement.selectCell(target.layer, target.x, target.z);
     } else {
       this.placement.clearSelection();
     }
@@ -298,17 +307,35 @@ export default class ViewportController {
   }
   
   _doRotate(x, z) {
-    if (this._hoveredTargetCell) {
-      this.placement.selectCell(this._hoveredTargetCell.layer, this._hoveredTargetCell.x, this._hoveredTargetCell.z);
+    let target = this._hoveredTargetCell;
+    if (!target) {
+      const prop = this.placement.getCell('prop', x, z);
+      if (prop) target = { layer: 'prop', x, z };
+      else {
+        const ground = this.placement.getCell('ground', x, z);
+        if (ground) target = { layer: 'ground', x, z };
+      }
+    }
+    if (target) {
+      this.placement.selectCell(target.layer, target.x, target.z);
       this.placement.rotateSelected(90);
     }
   }
 
   _doTransformSelect(x, z) {
     const tm = this._getToolManager();
+    let target = this._hoveredTargetCell;
+    if (!target) {
+      const prop = this.placement.getCell('prop', x, z);
+      if (prop) target = { layer: 'prop', x, z };
+      else {
+        const ground = this.placement.getCell('ground', x, z);
+        if (ground) target = { layer: 'ground', x, z };
+      }
+    }
     
-    if (this._hoveredTargetCell) {
-      this.placement.selectCell(this._hoveredTargetCell.layer, this._hoveredTargetCell.x, this._hoveredTargetCell.z);
+    if (target) {
+      this.placement.selectCell(target.layer, target.x, target.z);
       this._onUpdatePropertyPanel();
       if (tm.transformTool === 't-move' || tm.transformTool === 't-rotate' || tm.transformTool === 't-scale') {
         tm._showGizmo(tm.transformTool);
@@ -434,20 +461,32 @@ export default class ViewportController {
 
       if (this._dragAxis === 'x') {
         newX += delta.x;
-        if (snap.enabled) newX = Math.round(newX / (snap.move * this.app.tileSize)) * (snap.move * this.app.tileSize);
+        if (e.shiftKey) newX = Math.round(newX / 0.01) * 0.01;
+        else if (snap.enabled) newX = Math.round(newX / (snap.move * this.app.tileSize)) * (snap.move * this.app.tileSize);
+        else newX = Math.round(newX / 0.1) * 0.1;
       } else if (this._dragAxis === 'y') {
         newY += delta.y;
-        if (snap.enabled) newY = Math.round(newY / (snap.move * this.app.tileSize * 0.5)) * (snap.move * this.app.tileSize * 0.5);
+        if (e.shiftKey) newY = Math.round(newY / 0.01) * 0.01;
+        else if (snap.enabled) newY = Math.round(newY / (snap.move * this.app.tileSize * 0.5)) * (snap.move * this.app.tileSize * 0.5);
+        else newY = Math.round(newY / 0.1) * 0.1;
       } else if (this._dragAxis === 'z') {
         newZ += delta.z;
-        if (snap.enabled) newZ = Math.round(newZ / (snap.move * this.app.tileSize)) * (snap.move * this.app.tileSize);
+        if (e.shiftKey) newZ = Math.round(newZ / 0.01) * 0.01;
+        else if (snap.enabled) newZ = Math.round(newZ / (snap.move * this.app.tileSize)) * (snap.move * this.app.tileSize);
+        else newZ = Math.round(newZ / 0.1) * 0.1;
       } else {
         newX += delta.x;
         newZ += delta.z;
-        if (snap.enabled) {
+        if (e.shiftKey) {
+          newX = Math.round(newX / 0.01) * 0.01;
+          newZ = Math.round(newZ / 0.01) * 0.01;
+        } else if (snap.enabled) {
           const snapUnit = snap.move * this.app.tileSize;
           newX = Math.round(newX / snapUnit) * snapUnit;
           newZ = Math.round(newZ / snapUnit) * snapUnit;
+        } else {
+          newX = Math.round(newX / 0.1) * 0.1;
+          newZ = Math.round(newZ / 0.1) * 0.1;
         }
       }
 
@@ -464,20 +503,26 @@ export default class ViewportController {
         const currentAngle = Math.atan2(worldHit.y - cy, worldHit.z - cz);
         let deltaRad = currentAngle - this._dragStartAngle;
         let newXRad = this._dragOriginalEuler.x + deltaRad;
-        if (snap.enabled) newXRad = (Math.round((newXRad * 180 / Math.PI) / snap.rotate) * snap.rotate * Math.PI) / 180;
+        if (e.shiftKey) newXRad = (Math.round((newXRad * 180 / Math.PI) / 0.01) * 0.01 * Math.PI) / 180;
+        else if (snap.enabled) newXRad = (Math.round((newXRad * 180 / Math.PI) / snap.rotate) * snap.rotate * Math.PI) / 180;
+        else newXRad = (Math.round((newXRad * 180 / Math.PI) / 0.1) * 0.1 * Math.PI) / 180;
         cell.object3d.rotation.x = newXRad;
       } else if (this._dragAxis === 'rot-z') {
         const currentAngle = Math.atan2(worldHit.y - cy, worldHit.x - cx);
         let deltaRad = currentAngle - this._dragStartAngle;
         let newZRad = this._dragOriginalEuler.z + deltaRad;
-        if (snap.enabled) newZRad = (Math.round((newZRad * 180 / Math.PI) / snap.rotate) * snap.rotate * Math.PI) / 180;
+        if (e.shiftKey) newZRad = (Math.round((newZRad * 180 / Math.PI) / 0.01) * 0.01 * Math.PI) / 180;
+        else if (snap.enabled) newZRad = (Math.round((newZRad * 180 / Math.PI) / snap.rotate) * snap.rotate * Math.PI) / 180;
+        else newZRad = (Math.round((newZRad * 180 / Math.PI) / 0.1) * 0.1 * Math.PI) / 180;
         cell.object3d.rotation.z = newZRad;
       } else {
         // rot-y (default)
         const currentAngle = Math.atan2(worldHit.z - cz, worldHit.x - cx);
         let deltaDeg = ((currentAngle - this._dragStartAngle) * 180) / Math.PI;
         let newRot = this._dragOriginalRot + deltaDeg;
-        if (snap.enabled) newRot = Math.round(newRot / snap.rotate) * snap.rotate;
+        if (e.shiftKey) newRot = Math.round(newRot / 0.01) * 0.01;
+        else if (snap.enabled) newRot = Math.round(newRot / snap.rotate) * snap.rotate;
+        else newRot = Math.round(newRot / 0.1) * 0.1;
         newRot = ((newRot % 360) + 360) % 360;
         cell.rotation = newRot;
         cell.object3d.rotation.y = (newRot * Math.PI) / 180;
@@ -509,7 +554,15 @@ export default class ViewportController {
         newSZ = Math.max(0.1, Math.min(20.0, this._dragOriginalScaleZ + scaleChange));
       }
 
-      if (snap.enabled) {
+      if (e.shiftKey) {
+        if (this._dragAxis === 'scale-x' || this._dragAxis === 'scale-all') newSX = Math.round(newSX / 0.01) * 0.01;
+        if (this._dragAxis === 'scale-y' || this._dragAxis === 'scale-all') newSY = Math.round(newSY / 0.01) * 0.01;
+        if (this._dragAxis === 'scale-z' || this._dragAxis === 'scale-all') newSZ = Math.round(newSZ / 0.01) * 0.01;
+      } else if (snap.enabled) {
+        if (this._dragAxis === 'scale-x' || this._dragAxis === 'scale-all') newSX = Math.round(newSX / 0.1) * 0.1;
+        if (this._dragAxis === 'scale-y' || this._dragAxis === 'scale-all') newSY = Math.round(newSY / 0.1) * 0.1;
+        if (this._dragAxis === 'scale-z' || this._dragAxis === 'scale-all') newSZ = Math.round(newSZ / 0.1) * 0.1;
+      } else {
         if (this._dragAxis === 'scale-x' || this._dragAxis === 'scale-all') newSX = Math.round(newSX / 0.1) * 0.1;
         if (this._dragAxis === 'scale-y' || this._dragAxis === 'scale-all') newSY = Math.round(newSY / 0.1) * 0.1;
         if (this._dragAxis === 'scale-z' || this._dragAxis === 'scale-all') newSZ = Math.round(newSZ / 0.1) * 0.1;
