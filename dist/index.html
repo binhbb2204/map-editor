@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MapKit Editor — 3D Map Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-BscXwGc5.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-C6HKb6aX.css">
+</head>
+<body>
+  <div id="editor-screen">
+    <!-- Top Toolbar -->
+    <div id="toolbar">
+      <div class="toolbar-left">
+        <input type="text" id="map-name-input" class="map-name-input" value="arena_map" placeholder="Map Name" />
+      </div>
+      <div class="toolbar-center">
+        <button id="tool-select" class="tool-btn active" title="Select (V)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+        </button>
+        <button id="tool-place" class="tool-btn" title="Place (B)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        </button>
+        <button id="tool-paint" class="tool-btn" title="Paint (P)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+        </button>
+        <button id="tool-erase" class="tool-btn" title="Eraser (E)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H7L3 16l9-9 8 8-4 4"/><path d="M6.5 13.5l5-5"/></svg>
+        </button>
+        <div class="toolbar-divider"></div>
+        <button id="btn-rotate-cw" class="tool-btn" title="Rotate CW (R)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+        <button id="btn-rotate-ccw" class="tool-btn" title="Rotate CCW (Shift+R)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </button>
+        <div class="toolbar-divider"></div>
+        <button id="btn-undo" class="tool-btn" title="Undo (Ctrl+Z)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+        </button>
+        <button id="btn-redo" class="tool-btn" title="Redo (Ctrl+Y)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+        </button>
+      </div>
+      <div class="toolbar-right">
+        <button class="tool-btn" id="btn-auto-gen" title="Auto Generate Map (Procedural)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        </button>
+        <button class="tool-btn" id="btn-settings" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+        <button id="btn-save" class="btn-primary" style="margin-left: 12px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Editor Area -->
+    <div id="editor-body">
+      <!-- Left: Asset Panel -->
+      <div id="asset-panel">
+        
+        <!-- Setup Section (Initial) -->
+        <div id="setup-section">
+          <h2>MapKit Editor</h2>
+          <p>Trực quan hóa Grid & Map 3D</p>
+          
+          <div class="grid-size-config">
+            <label>Grid Size:</label>
+            <input type="number" id="grid-width" value="25" min="5" max="100" />
+            <span>×</span>
+            <input type="number" id="grid-height" value="25" min="5" max="100" />
+          </div>
+
+          <button id="btn-start" class="btn-primary" style="width: 100%; margin-bottom: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>
+            Bắt Đầu (Start Editor)
+          </button>
+          
+          <button id="btn-load-map" class="btn-secondary" style="width: 100%;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Load Map JSON
+          </button>
+        </div>
+
+        <!-- Browser Section (After Kit Loaded) -->
+        <div id="browser-section" style="display: none; flex-direction: column; height: 100%; overflow: hidden;">
+          <div class="panel-header">
+            <span>Assets</span>
+            <button id="btn-add-kit" class="layer-btn" title="Add another Kit folder" style="margin-left:auto; margin-right:8px; width:auto; padding: 0 8px; font-size: 0.8rem;">+ Folder</button>
+            <div class="layer-toggles">
+              <button id="layer-ground" class="layer-btn active" title="Ground Layer">G</button>
+              <button id="layer-prop" class="layer-btn active" title="Prop Layer">P</button>
+            </div>
+          </div>
+          <div class="search-filter-box">
+            <div class="search-input-wrapper">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="asset-search" placeholder="Search assets..." />
+            </div>
+            <select id="category-filter" class="category-select">
+              <option value="all">All Categories</option>
+            </select>
+          </div>
+          <div id="asset-grid"></div>
+          <div id="pagination-controls" class="pagination-controls"></div>
+        </div>
+      </div>
+
+      <!-- Center: 3D Viewport -->
+      <div id="viewport"></div>
+
+      <!-- Right: Property Panel -->
+      <div id="property-panel">
+        <div class="panel-header"><span>Properties</span></div>
+        <div id="prop-content">
+          <p class="prop-empty">Click an object to inspect</p>
+        </div>
+        <!-- Minimap -->
+        <div class="panel-header" style="margin-top:auto;"><span>Minimap (M)</span></div>
+        <canvas id="minimap" width="200" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div id="status-bar">
+      <span id="status-coords">X: 0, Z: 0</span>
+      <span id="status-tool">Tool: Select</span>
+      <span id="status-count">Objects: 0</span>
+    </div>
+  </div>
+
+  <!-- Large Minimap Overlay -->
+  <div id="large-minimap-overlay" class="hidden overlay-modal">
+    <div class="minimap-modal">
+      <h2>Map Overview</h2>
+      <canvas id="minimap-large" width="800" height="800"></canvas>
+      <div class="minimap-hint">Press <span>M</span> to close</div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-overlay" class="hidden overlay-modal">
+    <div class="settings-modal premium-modal">
+      <div class="modal-header">
+        <h2 id="lang-settings-title">Preferences</h2>
+        <button id="btn-close-settings-x" class="btn-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      
+      <div class="settings-body">
+        <div class="setting-group">
+          <h3 id="lang-graphics">Graphics & Environment</h3>
+          <div class="setting-row">
+            <label id="lang-ui-theme">UI Theme</label>
+            <select id="ui-theme-select">
+              <option value="dark">Dark Mode</option>
+              <option value="light">Light Mode</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label id="lang-sky-theme">Sky & Lighting</label>
+            <select id="sky-theme-select">
+              <option value="dark">Night Sky</option>
+              <option value="light">Day Sky</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label id="lang-weather">Weather</label>
+            <select id="weather-theme-select">
+              <option value="clear">Clear</option>
+              <option value="rain">Rain (Coming Soon)</option>
+              <option value="snow">Snow (Coming Soon)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <h3 id="lang-editor">Editor Setup</h3>
+          <div class="setting-row">
+            <label id="lang-grid-size">Grid Size</label>
+            <div class="grid-input-group">
+              <input type="number" id="setting-grid-w" min="5" max="100">
+              <span>×</span>
+              <input type="number" id="setting-grid-h" min="5" max="100">
+              <button id="btn-apply-grid" class="btn-primary lang-apply">Apply</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <label id="lang-language">Language</label>
+            <div class="lang-toggle">
+              <button id="btn-lang-en" class="active">EN</button>
+              <button id="btn-lang-vi">VI</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-close-settings" class="btn-primary lang-close" style="width: 100%;">Save & Close</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

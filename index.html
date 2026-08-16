@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MapKit Studio Editor</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="theme-light h-screen flex flex-col text-sm bg-gray-100 select-none">
+  
+  <!-- BEGIN: Top Studio Menu Bar (VS Code / Studio style) -->
+  <div class="menu-bar flex items-center bg-slate-900 text-slate-300 text-xs px-3 py-1.5 border-b border-slate-800 space-x-4 shrink-0 z-30">
+    <div class="font-bold text-white flex items-center space-x-2 mr-2">
+      <i class="fas fa-cube text-blue-400 text-sm"></i>
+      <span class="tracking-wide">MapKit Studio</span>
+    </div>
+    
+    <!-- File Menu -->
+    <div class="relative group cursor-pointer hover:text-white py-0.5">
+      <span>File</span>
+      <div class="hidden group-hover:block absolute top-full left-0 bg-slate-800 text-slate-200 border border-slate-700 rounded-md shadow-2xl py-1 w-48 z-50">
+        <div id="btn-file-new" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-file-alt mr-2 text-slate-400"></i> New Map</span>
+        </div>
+        <div id="btn-load-map" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-folder-open mr-2 text-slate-400"></i> Open JSON...</span>
+        </div>
+        <hr class="border-slate-700 my-1"/>
+        <div id="btn-save-menu" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-save mr-2 text-slate-400"></i> Save Map</span>
+          <span class="text-[10px] text-slate-400">Ctrl+S</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Menu -->
+    <div class="relative group cursor-pointer hover:text-white py-0.5">
+      <span>Edit</span>
+      <div class="hidden group-hover:block absolute top-full left-0 bg-slate-800 text-slate-200 border border-slate-700 rounded-md shadow-2xl py-1 w-48 z-50">
+        <div id="menu-undo" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-undo mr-2 text-slate-400"></i> Undo</span>
+          <span class="text-[10px] text-slate-400">Ctrl+Z</span>
+        </div>
+        <div id="menu-redo" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-redo mr-2 text-slate-400"></i> Redo</span>
+          <span class="text-[10px] text-slate-400">Ctrl+Y</span>
+        </div>
+        <hr class="border-slate-700 my-1"/>
+        <div id="menu-autogen" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex justify-between items-center">
+          <span><i class="fas fa-magic mr-2 text-purple-400"></i> Auto Generate</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Menu (Toggle Panels) -->
+    <div class="relative group cursor-pointer hover:text-white py-0.5">
+      <span>View</span>
+      <div class="hidden group-hover:block absolute top-full left-0 bg-slate-800 text-slate-200 border border-slate-700 rounded-md shadow-2xl py-1 w-52 z-50">
+        <div id="btn-toggle-left-panel" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between">
+          <span><i class="fas fa-toolbox mr-2 text-slate-400"></i> Asset Toolbox</span>
+          <i class="fas fa-check text-xs text-blue-400" id="chk-toolbox"></i>
+        </div>
+        <div id="btn-toggle-props-panel" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between">
+          <span><i class="fas fa-sliders-h mr-2 text-slate-400"></i> Properties Panel</span>
+          <i class="fas fa-check text-xs text-blue-400" id="chk-props"></i>
+        </div>
+        <div id="btn-toggle-minimap-panel" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between">
+          <span><i class="fas fa-map mr-2 text-slate-400"></i> Minimap</span>
+          <i class="fas fa-check text-xs text-blue-400" id="chk-minimap"></i>
+        </div>
+        <hr class="border-slate-700 my-1"/>
+        <div id="btn-toggle-ribbon" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between">
+          <span><i class="fas fa-bars mr-2 text-slate-400"></i> Action Ribbon</span>
+          <i class="fas fa-check text-xs text-blue-400" id="chk-ribbon"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Window Menu -->
+    <div class="relative group cursor-pointer hover:text-white py-0.5">
+      <span>Window</span>
+      <div class="hidden group-hover:block absolute top-full left-0 bg-slate-800 text-slate-200 border border-slate-700 rounded-md shadow-2xl py-1 w-48 z-50">
+        <div id="btn-reset-layout" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white">
+          <span><i class="fas fa-columns mr-2 text-slate-400"></i> Reset Layout</span>
+        </div>
+        <div id="btn-settings-menu" class="px-3 py-1.5 hover:bg-blue-600 hover:text-white">
+          <span><i class="fas fa-cog mr-2 text-slate-400"></i> Preferences...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1"></div>
+
+    <!-- Map Name & Save Quick Control -->
+    <div class="flex items-center space-x-2">
+      <input type="text" id="map-name-input" value="arena_map" class="bg-slate-800 text-slate-100 text-xs border border-slate-700 rounded px-2 py-0.5 w-32 focus:outline-none focus:border-blue-500 font-semibold" placeholder="Map Name" />
+      <button id="btn-save" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-0.5 rounded text-xs font-semibold flex items-center space-x-1.5 shadow transition-colors">
+        <i class="fas fa-save text-[11px]"></i><span>Save</span>
+      </button>
+    </div>
+  </div>
+  <!-- END: Top Studio Menu Bar -->
+
+  <!-- BEGIN: Action Ribbon Toolbar -->
+  <header id="action-ribbon" class="bg-white border-b border-gray-200 p-1 flex items-center shadow-sm shrink-0 z-20 overflow-x-auto">
+    
+    <!-- Transform Tools Group -->
+    <div class="flex items-center space-x-0.5" id="toolbar">
+      <button id="tool-t-select" class="tool-btn active" title="Select Object (1)"><i class="fas fa-mouse-pointer text-sm"></i><span class="text-[10px] mt-0.5 font-bold">Select</span></button>
+      <button id="tool-t-move" class="tool-btn" title="Move Object (2)"><i class="fas fa-arrows-up-down-left-right text-sm"></i><span class="text-[10px] mt-0.5 font-bold">Move</span></button>
+      <button id="tool-t-scale" class="tool-btn" title="Scale Object"><i class="fas fa-expand-arrows-alt text-sm"></i><span class="text-[10px] mt-0.5 font-bold">Scale</span></button>
+      <button id="tool-t-rotate" class="tool-btn" title="Rotate Object (3)"><i class="fas fa-sync-alt text-sm"></i><span class="text-[10px] mt-0.5 font-bold">Rotate</span></button>
+    </div>
+    
+    <div class="h-6 w-[1px] bg-gray-200 mx-2"></div>
+
+    <!-- Drawing & Edit Tools -->
+    <div class="flex items-center space-x-0.5">
+      <button id="tool-select" class="tool-btn" title="Pick Tile (V)"><i class="fas fa-hand-pointer text-sm text-slate-600"></i><span class="text-[10px] mt-0.5">Pick</span></button>
+      <button id="tool-place" class="tool-btn" title="Place Asset (B)"><i class="fas fa-cube text-sm text-blue-600"></i><span class="text-[10px] mt-0.5">Place</span></button>
+      <button id="tool-paint" class="tool-btn" title="Paint Asset (P)"><i class="fas fa-paint-brush text-sm text-purple-600"></i><span class="text-[10px] mt-0.5">Paint</span></button>
+      <button id="tool-erase" class="tool-btn" title="Erase Asset (E)"><i class="fas fa-eraser text-sm text-red-500"></i><span class="text-[10px] mt-0.5">Erase</span></button>
+    </div>
+
+    <div class="h-6 w-[1px] bg-gray-200 mx-2"></div>
+
+    <!-- History & Rotation -->
+    <div class="flex items-center space-x-0.5">
+      <button id="btn-undo" class="tool-btn" title="Undo (Ctrl+Z)"><i class="fas fa-undo text-sm"></i><span class="text-[10px] mt-0.5">Undo</span></button>
+      <button id="btn-redo" class="tool-btn" title="Redo (Ctrl+Y)"><i class="fas fa-redo text-sm"></i><span class="text-[10px] mt-0.5">Redo</span></button>
+      <button id="btn-rotate-cw" class="tool-btn" title="Rotate CW (R)"><i class="fas fa-sync-alt text-sm text-slate-500"></i><span class="text-[10px] mt-0.5">Rot CW</span></button>
+      <button id="btn-rotate-ccw" class="tool-btn" title="Rotate CCW (Shift+R)"><i class="fas fa-sync-alt fa-flip-horizontal text-sm text-slate-500"></i><span class="text-[10px] mt-0.5">Rot CCW</span></button>
+    </div>
+
+    <div class="h-6 w-[1px] bg-gray-200 mx-2"></div>
+
+    <!-- Snapping Config -->
+    <div class="flex items-center space-x-2 bg-gray-50 px-2.5 py-1 rounded border border-gray-200 text-xs">
+      <label class="flex items-center cursor-pointer font-bold text-gray-700">
+        <input type="checkbox" id="snap-enabled" checked class="mr-1.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" /> Snap
+      </label>
+      <div class="flex items-center space-x-1.5">
+        <div class="flex items-center bg-white border border-gray-300 rounded overflow-hidden">
+          <span class="px-1 text-gray-400 text-[10px] bg-gray-50 border-r border-gray-200">Grid</span>
+          <input type="number" id="snap-move-val" value="1" min="0.1" step="0.1" class="w-10 text-xs border-none p-0.5 text-center focus:ring-0" />
+        </div>
+        <div class="flex items-center bg-white border border-gray-300 rounded overflow-hidden">
+          <span class="px-1 text-gray-400 text-[10px] bg-gray-50 border-r border-gray-200">Rot°</span>
+          <input type="number" id="snap-rotate-val" value="90" min="1" step="1" class="w-10 text-xs border-none p-0.5 text-center focus:ring-0" />
+        </div>
+      </div>
+    </div>
+
+    <div class="h-6 w-[1px] bg-gray-200 mx-2"></div>
+
+    <!-- Quick Action Extras -->
+    <div class="flex items-center space-x-1">
+      <button id="btn-auto-gen" class="tool-btn" title="Procedural Generator"><i class="fas fa-magic text-sm text-purple-600"></i><span class="text-[10px] mt-0.5">Generate</span></button>
+      <button id="btn-settings" class="tool-btn" title="Settings Panel"><i class="fas fa-cog text-sm text-slate-600"></i><span class="text-[10px] mt-0.5">Settings</span></button>
+    </div>
+
+    <div class="flex-1"></div>
+
+    <!-- Quick Toggle Panel Buttons -->
+    <div class="flex items-center space-x-1 bg-gray-100 p-0.5 rounded border border-gray-200">
+      <button id="btn-quick-toolbox" class="px-2 py-1 bg-white shadow-sm border border-gray-200 rounded text-xs font-semibold text-slate-700 hover:text-blue-600 flex items-center space-x-1" title="Toggle Asset Toolbox">
+        <i class="fas fa-toolbox text-blue-500"></i><span>Assets</span>
+      </button>
+      <button id="btn-quick-props" class="px-2 py-1 bg-white shadow-sm border border-gray-200 rounded text-xs font-semibold text-slate-700 hover:text-blue-600 flex items-center space-x-1" title="Toggle Properties">
+        <i class="fas fa-sliders-h text-indigo-500"></i><span>Props</span>
+      </button>
+      <button id="btn-quick-minimap" class="px-2 py-1 bg-white shadow-sm border border-gray-200 rounded text-xs font-semibold text-slate-700 hover:text-blue-600 flex items-center space-x-1" title="Toggle Minimap">
+        <i class="fas fa-map text-emerald-500"></i><span>Minimap</span>
+      </button>
+    </div>
+  </header>
+  <!-- END: Action Ribbon Toolbar -->
+
+  <!-- BEGIN: Main Workspace Area -->
+  <main class="flex-1 relative overflow-hidden bg-gray-200">
+    
+    <!-- 1. FULLSCREEN 3D VIEWPORT (Background Layer) -->
+    <section class="absolute inset-0 z-0 flex flex-col" id="viewport-wrapper">
+      <!-- Status Badge Overlay -->
+      <div id="status-bar" class="absolute top-3 left-3 flex space-x-2 z-10 text-xs font-mono select-none pointer-events-none">
+        <div id="status-tool" class="bg-slate-900/80 text-slate-100 px-2.5 py-1 rounded-md backdrop-blur-md shadow border border-slate-700/50">Tool: Select</div>
+        <div id="status-coords" class="bg-slate-900/80 text-slate-100 px-2.5 py-1 rounded-md backdrop-blur-md shadow border border-slate-700/50">X: 0, Z: 0</div>
+        <div id="status-count" class="bg-slate-900/80 text-slate-100 px-2.5 py-1 rounded-md backdrop-blur-md shadow border border-slate-700/50">Obj: 0</div>
+      </div>
+      <!-- 3D Viewport Canvas Container -->
+      <div id="viewport" class="w-full h-full bg-slate-900 outline-none relative overflow-hidden" tabindex="0"></div>
+    </section>
+
+    <!-- 2. FOREGROUND UI LAYER (Pointer events none so you can click the 3D map through empty spaces) -->
+    <div class="absolute inset-0 z-10 pointer-events-none flex justify-between overflow-hidden">
+      
+      <!-- LEFT SIDE WRAPPER -->
+      <div class="flex h-full pointer-events-auto" id="dock-left-wrapper">
+        <!-- LEFT DOCK -->
+        <aside id="dock-left" class="bg-white/95 backdrop-blur-xl border-r border-gray-200/60 flex flex-col shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.06)]" style="width: 270px; min-width: 200px; max-width: 450px;">
+          
+          <!-- Toolbox Panel -->
+          <div id="asset-panel" class="dockable-panel flex flex-col flex-1 bg-transparent overflow-hidden group">
+            
+            <!-- Panel Header -->
+            <div class="dock-handle bg-slate-50/80 backdrop-blur border-b border-gray-200/80 px-3 py-2 flex justify-between items-center shrink-0 cursor-grab">
+              <span class="font-bold text-[11px] text-slate-600 uppercase tracking-wider flex items-center pointer-events-none">
+                <i class="fas fa-grip-vertical text-slate-300 mr-2 group-hover:text-slate-400 transition-colors"></i>
+                <i class="fas fa-toolbox text-blue-500 mr-2"></i> Toolbox
+              </span>
+              <div class="flex items-center space-x-1 text-slate-400">
+                <button id="btn-minimize-toolbox" class="hover:text-blue-600 hover:bg-blue-50/50 transition-colors p-1 rounded text-xs leading-none" title="Minimize Vertically"><i class="fas fa-minus"></i></button>
+                <button id="btn-add-kit" class="hover:text-emerald-600 hover:bg-emerald-50/50 transition-colors p-1 rounded text-xs leading-none" title="Add Kit Folder"><i class="fas fa-folder-plus"></i></button>
+                <button id="btn-collapse-left" class="hover:text-red-500 hover:bg-red-50/50 transition-colors p-1 rounded text-xs leading-none" title="Hide Panel"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+            
+            <!-- Hidden compatibility setup section (used programmatically) -->
+            <div id="setup-section" class="hidden">
+              <input type="number" id="grid-width" value="25" />
+              <input type="number" id="grid-height" value="25" />
+              <button id="btn-start"></button>
+            </div>
+
+            <!-- Asset Browser Section -->
+            <div id="browser-section" class="flex flex-col h-full overflow-hidden transition-all duration-300">
+              <!-- Layer Selector Tabs -->
+              <div class="flex border-b border-gray-200/80 bg-gray-50/50 shrink-0">
+                <button id="layer-prop" class="layer-btn active flex-1"><i class="fas fa-cubes mr-1.5"></i>Props</button>
+                <button id="layer-ground" class="layer-btn flex-1"><i class="fas fa-square mr-1.5"></i>Ground</button>
+              </div>
+              
+              <!-- Search & Category Filters -->
+              <div class="p-3 border-b border-gray-200/80 bg-white/50 space-y-2 shrink-0 shadow-sm relative">
+                <div class="relative group-search">
+                  <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-xs transition-colors group-focus-within:text-blue-500"></i>
+                  <input type="text" id="asset-search" class="w-full text-xs pl-8 pr-3 py-2 border border-gray-200 rounded-lg bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-inner" placeholder="Search models..." />
+                </div>
+                <div class="relative">
+                  <select id="category-filter" class="w-full text-xs border border-gray-200 rounded-lg py-2 px-3 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none">
+                    <option value="all">All Categories</option>
+                  </select>
+                  <i class="fas fa-chevron-down absolute right-3 top-2.5 text-slate-400 text-[10px] pointer-events-none"></i>
+                </div>
+              </div>
+              
+              <!-- Asset Cards Grid -->
+              <div class="flex-1 overflow-y-auto p-2 bg-slate-50/30">
+                <div id="asset-grid" class="grid grid-cols-2 gap-2"></div>
+              </div>
+              
+              <!-- Pagination Controls -->
+              <div id="pagination-controls" class="border-t border-gray-200/80 bg-white/50 p-1.5 flex justify-center space-x-1 shrink-0 overflow-x-auto"></div>
+            </div>
+          </div>
+        </aside>
+        
+        <!-- LEFT RESIZER HANDLE -->
+        <div id="resizer-left" class="panel-resizer w-1.5 cursor-col-resize hover:bg-blue-400/50 transition-colors bg-transparent border-r border-transparent" title="Drag to resize left panel"></div>
+      </div>
+
+      <!-- INVISIBLE SPACER TO KEEP RIGHT DOCK ON THE RIGHT -->
+      <div class="flex-1 pointer-events-none"></div>
+
+      <!-- RIGHT SIDE WRAPPER -->
+      <div class="flex h-full pointer-events-auto" id="dock-right-wrapper">
+        <!-- RIGHT RESIZER HANDLE -->
+        <div id="resizer-right" class="panel-resizer w-1.5 cursor-col-resize hover:bg-blue-400/50 transition-colors bg-transparent border-l border-transparent" title="Drag to resize right panel"></div>
+        
+        <!-- RIGHT DOCK -->
+        <aside id="dock-right" class="bg-white/95 backdrop-blur-xl border-l border-gray-200/60 flex flex-col shrink-0 shadow-[-4px_0_24px_rgba(0,0,0,0.06)]" style="width: 280px; min-width: 220px; max-width: 480px;">
+          
+          <!-- Minimap Panel -->
+          <div id="minimap-container" class="dockable-panel flex flex-col border-b border-gray-200/80 bg-transparent shrink-0 group overflow-hidden" style="height: 220px;">
+            <div class="dock-handle bg-slate-50/80 backdrop-blur border-b border-gray-200/80 px-3 py-2 flex justify-between items-center shrink-0 cursor-grab">
+              <span class="font-bold text-[11px] text-slate-600 uppercase tracking-wider flex items-center pointer-events-none">
+                <i class="fas fa-grip-vertical text-slate-300 mr-2 group-hover:text-slate-400 transition-colors"></i>
+                <i class="fas fa-map text-emerald-500 mr-2"></i> Minimap (M)
+              </span>
+              <div class="flex items-center space-x-1 text-slate-400">
+                <button id="btn-toggle-minimap-minimize" class="hover:text-blue-600 hover:bg-blue-50/50 transition-colors rounded p-1 text-xs leading-none" title="Minimize Vertically"><i class="fas fa-minus"></i></button>
+                <button id="btn-toggle-minimap-panel" class="hover:text-red-500 hover:bg-red-50/50 transition-colors rounded p-1 text-xs leading-none" title="Close Minimap"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+            <div class="flex-1 relative bg-slate-900 overflow-hidden flex items-center justify-center p-0.5">
+              <canvas id="minimap" class="w-full h-full object-contain"></canvas>
+            </div>
+          </div>
+
+          <!-- MINIMAP HEIGHT RESIZER -->
+          <div id="resizer-minimap" class="h-1 bg-transparent hover:bg-blue-400/50 cursor-row-resize shrink-0 transition-colors" title="Drag up/down to resize Minimap height"></div>
+          
+          <!-- Properties Panel -->
+          <div id="property-panel" class="dockable-panel flex flex-col flex-1 bg-transparent overflow-hidden min-h-0 group">
+            <div class="dock-handle bg-slate-50/80 backdrop-blur border-b border-gray-200/80 px-3 py-2 flex justify-between items-center shrink-0 cursor-grab">
+              <span class="font-bold text-[11px] text-slate-600 uppercase tracking-wider flex items-center pointer-events-none">
+                <i class="fas fa-grip-vertical text-slate-300 mr-2 group-hover:text-slate-400 transition-colors"></i>
+                <i class="fas fa-sliders-h text-indigo-500 mr-2"></i> Properties
+              </span>
+              <div class="flex items-center space-x-1 text-slate-400">
+                <button id="btn-minimize-props" class="hover:text-blue-600 hover:bg-blue-50/50 transition-colors p-1 rounded text-xs leading-none" title="Minimize Vertically"><i class="fas fa-minus"></i></button>
+                <button id="btn-collapse-right" class="hover:text-red-500 hover:bg-red-50/50 transition-colors rounded p-1 text-xs leading-none" title="Hide Right Panel"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+            <div id="prop-content" class="flex-1 overflow-y-auto p-2">
+              <div class="p-6 text-center text-slate-400 text-xs font-semibold mt-4">
+                <i class="fas fa-mouse-pointer text-3xl mb-3 opacity-20 block text-slate-500"></i>
+                Click an object on the map to inspect properties
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+    </div>
+  </main>
+  <!-- END: Main Workspace Area -->
+
+  <!-- OVERLAYS: Floating Minimap Window (Draggable) -->
+  <div id="large-minimap-overlay" class="hidden fixed z-50 flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-300" style="width: 480px; height: 480px; top: 80px; right: 80px;">
+    <div id="minimap-drag-header" class="bg-gray-100 p-2.5 border-b border-gray-200 flex justify-between items-center cursor-move select-none">
+      <h2 class="font-bold text-slate-800 text-xs flex items-center"><i class="fas fa-grip-vertical text-slate-400 mr-2"></i><i class="fas fa-map text-emerald-600 mr-1.5"></i> Floating Minimap Window</h2>
+      <div class="flex items-center space-x-2">
+        <span class="text-[10px] text-slate-400 bg-gray-200 px-1.5 py-0.5 rounded font-mono">Press <b>M</b></span>
+        <button id="btn-close-large-minimap" class="text-slate-400 hover:text-red-500 text-xs px-1"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="flex-1 bg-slate-950 p-2 flex items-center justify-center overflow-hidden">
+      <canvas id="minimap-large" width="600" height="600" class="w-full h-full object-contain"></canvas>
+    </div>
+  </div>
+
+  <!-- OVERLAYS: Settings Panel Modal -->
+  <div id="settings-overlay" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center backdrop-blur-md transition-opacity">
+    <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-[420px] overflow-hidden border border-white/20 transform transition-transform">
+      <div class="bg-slate-50/80 p-4 border-b border-gray-200 flex justify-between items-center">
+        <h2 id="lang-settings-title" class="font-bold text-slate-800 text-base flex items-center tracking-tight"><i class="fas fa-sliders-h text-blue-500 mr-2.5"></i> Preferences</h2>
+        <button id="btn-close-settings-x" class="text-slate-400 hover:text-red-500 hover:bg-red-50 text-base p-1.5 rounded-lg transition-colors"><i class="fas fa-times w-4 h-4 flex items-center justify-center"></i></button>
+      </div>
+      <div class="p-5 space-y-6 text-sm">
+        
+        <!-- Graphics Section -->
+        <div>
+          <h3 id="lang-graphics" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-3">Graphics & Environment</h3>
+          <div class="space-y-3 bg-slate-50/50 p-3 rounded-xl border border-gray-100">
+            <div class="flex items-center justify-between">
+              <label class="text-slate-700 font-medium" id="lang-ui-theme">UI Theme</label>
+              <select id="ui-theme-select" class="w-40 text-sm border border-gray-200 rounded-lg p-1.5 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                <option value="light" selected>Light Studio</option>
+                <option value="dark">Dark Theme</option>
+              </select>
+            </div>
+            <div class="flex items-center justify-between">
+              <label class="text-slate-700 font-medium" id="lang-sky-theme">Sky & Lighting</label>
+              <select id="sky-theme-select" class="w-40 text-sm border border-gray-200 rounded-lg p-1.5 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                <option value="light">Day Sky</option>
+                <option value="dark">Night Sky</option>
+              </select>
+            </div>
+            <div class="hidden"><label id="lang-weather">Weather</label></div>
+          </div>
+        </div>
+        
+        <!-- Editor Section -->
+        <div>
+          <h3 id="lang-editor" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-3">Editor Setup</h3>
+          <div class="space-y-3 bg-slate-50/50 p-3 rounded-xl border border-gray-100">
+            <div>
+              <label class="block text-slate-700 font-medium mb-2" id="lang-grid-size">Grid Dimensions (W × H)</label>
+              <div class="flex items-center space-x-2">
+                <input type="number" id="setting-grid-w" min="5" max="100" class="w-20 border border-gray-200 shadow-sm rounded-lg text-sm p-1.5 text-center bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                <span class="text-slate-400 font-medium">×</span>
+                <input type="number" id="setting-grid-h" min="5" max="100" class="w-20 border border-gray-200 shadow-sm rounded-lg text-sm p-1.5 text-center bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                <button id="btn-apply-grid" class="lang-apply flex-1 bg-blue-50 text-blue-600 font-semibold py-1.5 px-3 rounded-lg hover:bg-blue-100 transition-colors border border-blue-200">Apply</button>
+              </div>
+            </div>
+            <div class="pt-2">
+              <label class="block text-slate-700 font-medium mb-2" id="lang-language">Language</label>
+              <div class="flex bg-gray-100/80 p-1 rounded-lg">
+                <button id="btn-lang-en" class="active flex-1 bg-white text-blue-600 font-semibold py-1.5 rounded shadow-sm transition-all text-xs">EN</button>
+                <button id="btn-lang-vi" class="flex-1 text-slate-500 hover:text-slate-700 font-medium py-1.5 rounded transition-all text-xs">VI</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      
+      <!-- Footer -->
+      <div class="bg-slate-50/80 p-4 border-t border-gray-200">
+        <button id="btn-close-settings" class="lang-close w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">Save & Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

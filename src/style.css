@@ -1,0 +1,200 @@
+/* Studio UI Stylesheet - Clean & Unified Light Theme */
+
+:root {
+  --panel-bg: #ffffff;
+  --panel-header-bg: #f8fafc;
+  --border-color: #e2e8f0;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --accent-color: #2563eb;
+  --accent-bg: #eff6ff;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f1f5f9;
+  color: var(--text-main);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Dark Mode Hackathon Filter */
+body:not(.theme-light) {
+  filter: invert(0.9) hue-rotate(180deg);
+}
+
+/* Double-invert things that should stay dark or normal */
+body:not(.theme-light) img,
+body:not(.theme-light) .fa-cubes,
+body:not(.theme-light) .fa-square,
+body:not(.theme-light) .fa-magic,
+body:not(.theme-light) .layer-btn.active,
+body:not(.theme-light) .menu-bar,
+body:not(.theme-light) #viewport,
+body:not(.theme-light) #minimap,
+body:not(.theme-light) #minimap-large,
+body:not(.theme-light) #status-tool,
+body:not(.theme-light) #status-coords,
+body:not(.theme-light) #status-count {
+  filter: invert(1.1) hue-rotate(180deg);
+}
+
+body:not(.theme-light) .asset-thumb-box {
+  background: white !important;
+}
+
+canvas {
+  outline: none !important;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Resizers for draggable sidebar width */
+.panel-resizer {
+  width: 5px;
+  background: #cbd5e1;
+  cursor: col-resize;
+  transition: background 0.2s;
+  z-index: 20;
+  flex-shrink: 0;
+}
+.panel-resizer:hover, .panel-resizer.dragging {
+  background: #3b82f6;
+}
+
+/* Toolbar Buttons */
+.tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #475569;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+.tool-btn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+.tool-btn.active {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+  border-color: #bfdbfe !important;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.1);
+}
+
+/* Layer Buttons */
+.layer-btn {
+  padding: 4px 12px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #64748b;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.layer-btn:hover {
+  color: #1e293b;
+}
+.layer-btn.active {
+  color: #2563eb !important;
+  border-bottom-color: #2563eb !important;
+  background: #ffffff;
+}
+
+/* Asset Cards */
+.asset-card {
+  transition: all 0.15s ease-out;
+}
+.asset-card:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.asset-card.selected {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3) !important;
+  background-color: #eff6ff !important;
+}
+
+/* Property Rows */
+.prop-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.8rem;
+}
+.prop-name {
+  width: 40%;
+  padding: 5px 8px;
+  background-color: #f8fafc;
+  border-right: 1px solid #f1f5f9;
+  font-weight: 500;
+  color: #475569;
+}
+.prop-value {
+  width: 60%;
+  padding: 3px 6px;
+}
+.prop-value input[type="number"],
+.prop-value input[type="text"] {
+  width: 100%;
+  padding: 2px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  background: #ffffff;
+  transition: border-color 0.15s;
+}
+.prop-value input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+/* Modals */
+.overlay-modal {
+  transition: opacity 0.2s ease;
+}
+.overlay-modal.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Floating Panels Custom Resizer */
+.dockable-panel.floating {
+  /* removed resize: both for custom JS resizer */
+}
+.floating-resizer {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  cursor: nwse-resize;
+  z-index: 99999;
+  background-color: rgba(255, 0, 0, 0.2);
+}
+.floating-resizer::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 10px;
+  height: 10px;
+  border-right: 3px solid #3b82f6; /* Blue border */
+  border-bottom: 3px solid #3b82f6;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.dockable-panel.floating .floating-resizer {
+  display: block !important;
+}
